@@ -17,7 +17,8 @@ class StudentView(APIView):
         serializer = StudentSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
-            return JsonResponse("student Added successfully",  safe= False)
+            return Response(serializer.data)
+        
         return JsonResponse("Failed to Add the student", safe= False)
     def get_student(self, pk):
         try:
@@ -34,3 +35,19 @@ class StudentView(APIView):
             data = Student.objects.all()
             serializer = StudentSerializer(data, many=True)
         return Response(serializer.data)
+    
+    def put(self, request, pk = None):
+        student_to_update = Student.objects.get(studentId = pk)
+        serializer = StudentSerializer(instance=student_to_update, data=request.data, partial = True)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse("Student was updated successfully", safe=False)
+        return JsonResponse("Failed to update the student", safe=False)
+    
+    def delete(self, request, pk):
+        student_to_delete = Student.objects.get(studentId = pk)
+        student_to_delete.delete()
+        return JsonResponse("Student was deleted successfully", safe=False)
+    
+
+
